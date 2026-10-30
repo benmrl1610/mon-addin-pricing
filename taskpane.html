@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>Pricing Produits Structurés</title>
+    <!-- Chargement de la bibliothèque officielle Office.js -->
+    <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js" type="text/javascript"></script>
+    <style>
+        body { font-family: Segoe UI, sans-serif; padding: 15px; margin: 0; background: #fdfdfd; }
+        h3 { font-size: 16px; margin-top: 0; color: #222; }
+        label { display: block; margin-top: 10px; font-weight: 600; font-size: 13px; color: #333; }
+        input, select { width: 100%; box-sizing: border-box; padding: 6px 8px; margin-top: 4px; border: 1px solid #ccc; border-radius: 4px; }
+        button { width: 100%; margin-top: 16px; padding: 10px; background: #0078d4; color: white; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        button:hover { background: #106ebe; }
+    </style>
+</head>
+<body>
+    <h3>Générateur de Pricing</h3>
+
+    <label for="produit">Type de produit</label>
+    <select id="produit">
+        <option value="taux_fixe">Taux Fixe Callable Distribué</option>
+    </select>
+
+    <label for="maturite">Maturité (en vert)</label>
+    <input type="text" id="maturite" value="5 ans" />
+
+    <label for="coupon">Coupon p.a. (en rouge)</label>
+    <input type="text" id="coupon" value="4.50%" />
+
+    <label for="rappel">Modalité de rappel (en violet)</label>
+    <input type="text" id="rappel" value="Au gré de l'émetteur, possible à partir de la fin de l'année 1" />
+
+    <label for="emission">Date d'émission</label>
+    <input type="text" id="emission" value="T+10" />
+
+    <button onclick="insererTableau()">Insérer dans l'e-mail</button>
+
+    <script type="text/javascript">
+        Office.onReady();
+
+        function insererTableau() {
+            var maturite = document.getElementById("maturite").value;
+            var coupon = document.getElementById("coupon").value;
+            var rappel = document.getElementById("rappel").value;
+            var emission = document.getElementById("emission").value;
+
+            // Définition de l'objet du mail
+            Office.context.mailbox.item.subject.setAsync("Demande de prix - Taux Fixe Callable Distribué");
+
+            // Construction du tableau HTML aux bonnes couleurs
+            var html = '<p>Bonjour,</p><p>Pourriez-vous s\'il vous plaît nous pricer la structure suivante :</p>' +
+                '<table style="border-collapse: collapse; width: 100%; max-width: 650px; font-family: Arial, sans-serif; border: 1.5px solid #000000; margin: 15px 0;">' +
+                '<thead><tr style="border-bottom: 1.5px solid #000000;"><th colspan="2" style="text-align: left; padding: 10px 14px; font-size: 15px; font-weight: bold; color: #000000;">Taux Fixe Callable <i>Distribué</i></th></tr></thead>' +
+                '<tbody>' +
+                '<tr style="border-bottom: 1px solid #000000;"><td style="width: 38%; padding: 10px 14px; font-size: 14px; color: #000000; border-right: 1px solid #000000;">Maturité</td><td style="padding: 10px 14px; font-size: 14px; font-weight: bold; color: #008A3B;">' + maturite + '</td></tr>' +
+                '<tr style="border-bottom: 1px solid #000000;"><td style="padding: 10px 14px; font-size: 14px; color: #000000; border-right: 1px solid #000000;">Protection</td><td style="padding: 10px 14px; font-size: 14px; font-weight: bold; color: #000000;">100% Capital protégé à maturité</td></tr>' +
+                '<tr style="border-bottom: 1px solid #000000;"><td style="padding: 10px 14px; font-size: 14px; color: #000000; border-right: 1px solid #000000;">Date d\'émission</td><td style="padding: 10px 14px; font-size: 14px; color: #000000;">' + emission + '</td></tr>' +
+                '<tr style="border-bottom: 1px solid #000000;"><td style="padding: 10px 14px; font-size: 14px; color: #000000; border-right: 1px solid #000000;">Remboursement Anticipé</td><td style="padding: 10px 14px; font-size: 14px; font-weight: bold; color: #6F2C91;">' + rappel + '</td></tr>' +
+                '<tr style="border-bottom: 1px solid #000000;"><td style="padding: 10px 14px; font-size: 14px; color: #000000; border-right: 1px solid #000000;">Constatations</td><td style="padding: 10px 14px; font-size: 14px; color: #000000;">Annuelles</td></tr>' +
+                '<tr style="border-bottom: 1px solid #000000;"><td style="padding: 10px 14px; font-size: 14px; color: #000000; border-right: 1px solid #000000;">Paiement</td><td style="padding: 10px 14px; font-size: 14px; font-style: italic; font-weight: bold; color: #000000;">Distribué</td></tr>' +
+                '<tr><td style="padding: 10px 14px; font-size: 14px; color: #000000; border-right: 1px solid #000000;">Coupons p.a.</td><td style="padding: 10px 14px; font-size: 14px; font-weight: bold; color: #D60000;">' + coupon + '</td></tr>' +
+                '</tbody></table>' +
+                '<p>Merci d\'avance pour vos retours.</p><p>Bien cordialement,</p>';
+
+            // Injection du HTML directement dans le corps de l'email actif
+            Office.context.mailbox.item.body.setSelectedDataAsync(
+                html,
+                { coercionType: Office.CoercionType.Html },
+                function (result) {
+                    if (result.status === Office.AsyncResultStatus.Failed) {
+                        alert("Erreur lors de l'insertion : " + result.error.message);
+                    }
+                }
+            );
+        }
+    </script>
+</body>
+</html>
